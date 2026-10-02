@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>Framing Catastrophe | Virtual Museum Exhibit</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card-bg: #181b22;
+      --border: #282d37;
+      --accent: #d97736;
+      --text-main: #e6edf3;
+      --text-muted: #8b949e;
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-serif: Georgia, "Times New Roman", serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.7;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background:
+        linear-gradient(rgba(15,17,21,.84), rgba(15,17,21,.96)),
+        radial-gradient(circle at 50% 20%, #633817 0%, transparent 48%);
+      border-bottom: 1px solid var(--border);
+      padding: 72px 20px 62px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2.3rem, 6vw, 4.2rem);
+      color: #fff;
+      margin-bottom: 10px;
+      letter-spacing: .5px;
+    }
+
+    header p {
+      color: var(--accent);
+      font-weight: 500;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(24,27,34,.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+    }
+
+    nav button {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: .95rem;
+      font-weight: 600;
+      padding: 9px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    nav button:hover {
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    nav button.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    main {
+      max-width: 980px;
+      margin: 44px auto;
+      padding: 0 20px;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active {
+      display: block;
+      animation: fadeIn .3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: clamp(24px, 5vw, 36px);
+      margin-bottom: 30px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.12);
+    }
+
+    h2 {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      color: #fff;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    h3 {
+      color: #fff;
+      font-size: 1.2rem;
+      margin: 24px 0 10px;
+    }
+
+    p {
+      margin-bottom: 17px;
+      font-size: 1.04rem;
+    }
+
+    .lead-box {
+      border-left: 3px solid var(--accent);
+      background: rgba(217,119,54,.08);
+      padding: 16px 20px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 28px;
+      color: #f0f6fc;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .timeline-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      background: #14171d;
+    }
+
+    .timeline-card span {
+      display: block;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: .85rem;
+      margin-bottom: 5px;
+    }
+
+    .timeline-card h3 {
+      font-size: 1.05rem;
+      margin: 0;
+    }
+
+    .timeline-card p {
+      color: var(--text-muted);
+      font-size: .9rem;
+      margin: 7px 0 0;
+      line-height: 1.4;
+    }
+
+    .exhibit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 24px;
+      background: #12151b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px;
+      margin: 28px 0;
+      align-items: start;
+    }
+
+    .exhibit-media {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .exhibit-media img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      display: block;
+      background: #000;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    .caption {
+      font-size: .84rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    .exhibit-analysis h4 {
+      color: var(--accent);
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .metadata-tag {
+      display: inline-block;
+      background: rgba(217,119,54,0.15);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    blockquote {
+      border-left: 2px solid var(--accent);
+      padding-left: 14px;
+      margin: 14px 0;
+      font-style: italic;
+      color: #c9d1d9;
+      background: rgba(255,255,255,0.02);
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    footer {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 20px;
+      color: var(--text-muted);
+      text-align: center;
+      font-size: .85rem;
+    }
+
+    @media (max-width: 820px) {
+      .timeline { grid-template-columns: 1fr 1fr; }
+      .exhibit-grid { grid-template-columns: 1fr; }
+      nav button { width: 100%; }
+    }
+
+    @media (max-width: 520px) {
+      .timeline { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Framing Catastrophe</h1>
+    <p>Disaster, Public Memory, and the Architecture of Modern Safety</p>
+  </header>
+
+  <nav aria-label="Exhibit navigation">
+    <button class="active" onclick="openTab(event, 'home')">Home / Introduction</button>
+    <button onclick="openTab(event, 'era1')">1. Edwardian Print (1900–1915)</button>
+    <button onclick="openTab(event, 'era-hindenburg')">2. Broadcast Rupture: Hindenburg (1937)</button>
+    <button onclick="openTab(event, 'era2')">3. Mid-Century Aviation (1970–1990)</button>
+    <button onclick="openTab(event, 'era3')">4. Broadcast & Reform (2001–Present)</button>
+  </nav>
+
+  <main>
+    <!-- INTRODUCTION TAB -->
+    <section id="home" class="tab-content active">
+      <div class="card">
+        <div class="lead-box">
+          <strong>Research Question:</strong>
+          How have major disasters been reported and remembered in the United States, and how have these events influenced public understanding of safety and security?[cite: 4]
+        </div>
+
+        <h2>Exhibit Overview</h2>
+
+        <p>
+          When catastrophic failure shatters daily life, the public does not experience the disaster in isolation; they encounter it mediated through the press.[cite: 4] Across more than a century of American history, mass-casualty events have served as critical inflection points where technological vulnerability, journalistic framing, and civic anxiety collide.[cite: 4]
+        </p>
+
+        <p>
+          This exhibition investigates how evolving news media—from dense Edwardian broadsheets to 24-hour cable broadcasts—constructed narratives of tragedy, and how those narratives shaped collective memory and institutional responses to safety and security.[cite: 4]
+        </p>
+
+        <p>
+          Disasters do not fade once the immediate wreckage is cleared.[cite: 4] As maritime historian Robert C. Moyer argues, catastrophic transport events endure within public culture because they become entrenched in collective memory through ongoing cultural reinterpretation.[cite: 4]
+        </p>
+
+        <p>
+          Early twentieth-century newspapers covering the 1903 Iroquois Theatre fire and the 1912 sinking of the RMS Titanic relied heavily on social hierarchies, dramatic narrative tension, and moral framing.[cite: 4] By the late twentieth century, coverage of disasters such as the 1977 Tenerife runway collision and the 1988 shootdown of Iran Air Flight 655 increasingly emphasized technical breakdown, geographic schematics, and geopolitical context.[cite: 4]
+        </p>
+
+        <p>
+          This relationship between reporting and public perception shifted decisively with real-time broadcasting.[cite: 4] In their analysis of the September 11 attacks, Ian R. McDonald and Regina G. Lawrence examine how the continuous news cycle framed the disaster through criminality, immediate crisis, and urgent peril.[cite: 4] The attacks were followed by major changes in transportation security policy, including the creation of the Transportation Security Administration.[cite: 4]
+        </p>
+
+        <p>
+          By examining historic front-page artifacts alongside contemporary media analysis, this exhibit explores how disaster reporting can shape the ways societies process trauma, assign responsibility, and reconsider public safety.[cite: 4]
+        </p>
+
+        <div class="timeline">
+          <div class="timeline-card">
+            <span>1900–1915</span>
+            <h3>Print Era</h3>
+            <p>Theatre fires, ocean liners, wireless telegraphy, and dramatic newspaper headlines.[cite: 4]</p>
+          </div>
+          <div class="timeline-card">
+            <span>1937</span>
+            <h3>Live Audio Shock</h3>
+            <p>Spontaneous eyewitness radio, emotional collapse, and the end of passenger dirigibles.</p>
+          </div>
+          <div class="timeline-card">
+            <span>1970–1990</span>
+            <h3>Aviation Era</h3>
+            <p>Photojournalism, technical explanations, survivor accounts, and Cold War geopolitics.[cite: 4]</p>
+          </div>
+          <div class="timeline-card">
+            <span>2001–Present</span>
+            <h3>Broadcast Era</h3>
+            <p>Continuous coverage, digital media, collective memory, and institutional reform.[cite: 4]</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: EDWARDIAN PRINT -->
+    <section id="era1" class="tab-content">
+      <div class="card">
+        <h2>Sub-Topic 1: The Edwardian Era of Print (1900–1915)</h2>
+        <p>
+          This section explores early twentieth-century print media before radio and television, focusing on how typography, wireless telegraphy, and social structures shaped reporting.[cite: 4]
+        </p>
+
+        <!-- Primary Source 1: Chicago Tribune Front Page (Iroquois Fire) -->
+        <div class="exhibit-grid">
+          <div class="exhibit-media">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Iroquois_Fire_Chicago_Daily_Tribune_Dec_31_1903.jpg" alt="Chicago Daily Tribune front page, December 31, 1903: Over 500 Dead in Fire">
+            <div class="caption">Front page of the <em>Chicago Daily Tribune</em>, December 31, 1903. Source: Library of Congress / Wikimedia Commons.</div>
+          </div>
+          <div class="exhibit-analysis">
+            <span class="metadata-tag">Primary Source Artifact 1</span>
+            <h4>Chicago Daily Tribune — "Over 500 Dead in Fire"</h4>
+            <p>
+              When Chicago’s supposedly "fireproof" Iroquois Theatre burned on December 30, 1903, killing over 600 people, the press framed the incident as a failure of municipal oversight and corporate negligence rather than an unavoidable accident.[cite: 4]
+            </p>
+            <p>
+              <strong>Media Analysis:</strong> The front page used stark casualty counters and victim portraits to turn public grief into civic anger.[cite: 4] By highlighting blocked exits, absent fire escapes, and an inoperable asbestos curtain, coverage forced city officials to enact strict public assembly regulations.[cite: 4] This reporting led directly to outward-opening exit doors, mandatory panic crash bars, and illuminated exit signage across the United States.
+            </p>
+          </div>
+        </div>
+
+        <!-- Primary Source 2: Titanic Front Page -->
+        <div class="exhibit-grid">
+          <div class="exhibit-media">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Titanic_front_page_The_New_York_Times.jpg" alt="New York Times front page, April 16, 1912: Titanic Sinks Four Hours After Hitting Iceberg">
+            <div class="caption">Front page of <em>The New York Times</em>, April 16, 1912. Source: Wikimedia Commons / NYT Archives.</div>
+          </div>
+          <div class="exhibit-analysis">
+            <span class="metadata-tag">Primary Source Artifact 2</span>
+            <h4>The New York Times — "Titanic Sinks Four Hours After Hitting Iceberg"</h4>
+            <p>
+              The sinking of the RMS Titanic on April 15, 1912, was an early test of Marconi wireless telegraphy under intense media pressure.[cite: 4]
+            </p>
+            <p>
+              <strong>Media Analysis:</strong> The front page reveals how Edwardian media framed maritime disasters around social standing.[cite: 4] The sub-headlines highlight wealthy travelers first—"Ismay Safe, Mrs. Astor Maybe, Noted Names Missing"—while lower-deck steerage passengers are relegated to an aggregate count. By printing conflicting early wireless reports alongside confirmed survivor lists, the <em>Times</em> exposed vulnerabilities in maritime communication, pushing the US Senate and British Board of Trade to mandate 24-hour radio watches and lifeboat capacity for all on board under the 1914 SOLAS treaty.
+            </p>
+          </div>
+        </div>
+
+        <!-- Primary Source 3: Carpathia Log / Distress Telegram -->
+        <div class="exhibit-grid">
+          <div class="exhibit-media">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Titanic_distress_telegram_Carpathia.png" alt="Marconi wireless distress telegram received from RMS Titanic on April 15, 1912">
+            <div class="caption">Marconi Wireless Telegraph Distress Dispatch received from RMS <em>Titanic</em> by the SS <em>Carpathia</em>, April 15, 1912. Source: The National Archives (UK) / Records of the Board of Trade.</div>
+          </div>
+          <div class="exhibit-analysis">
+            <span class="metadata-tag">Primary Source Artifact 3</span>
+            <h4>Marconi Wireless Distress Dispatch (April 15, 1912)</h4>
+            <blockquote>
+              “CQD CQD SOS SOS CQD DE MGY. We have struck iceberg. Sinking fast. Come to our assistance. Position Lat 41.46 N, Long 50.14 W. MGY.”
+            </blockquote>
+            <p>
+              <strong>Media Analysis:</strong> This raw telegraph transmission represents the frontline technology of the Edwardian information network. Early print coverage was severely hampered because wireless traffic was unregulated; commercial operators like Marconi held proprietary rights, allowing messages from surviving operators to be held exclusively for sale to newspapers like <em>The New York Times</em>.
+            </p>
+            <p>
+              The delay and confusion surrounding these fragmented telegrams exposed how unchecked corporate control over emergency signals cost lives, prompting the passage of the Radio Act of 1912, which mandated round-the-clock radio watches and placed distress transmissions under federal maritime priority.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: HINDENBURG -->
+    <section id="era-hindenburg" class="tab-content">
+      <div class="card">
+        <h2>Sub-Topic 2: Interwar Broadcasting & Spontaneous Trauma (1937)</h2>
+        <p>
+          The arrival of the German zeppelin <em>Hindenburg</em> at Lakehurst, New Jersey, on May 6, 1937, fundamentally changed disaster reporting. Media moved beyond reporting on tragedy after the fact to broadcasting an unvarnished human reaction as the event unfolded.
+        </p>
+
+        <!-- Primary Source 4: Actual Hindenburg Burning Photo -->
+        <div class="exhibit-grid">
+          <div class="exhibit-media">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Hindenburg_burning.jpg" alt="The German dirigible Hindenburg engulfed in flames at Lakehurst, New Jersey">
+            <div class="caption">Sam Shere / International News Photos: <em>The Hindenburg Disaster</em>, Lakehurst Naval Air Station, May 6, 1937. Source: Library of Congress / Wikimedia Commons.</div>
+          </div>
+          <div class="exhibit-analysis">
+            <span class="metadata-tag">Primary Source Artifact 4</span>
+            <h4>Eyewitness Moment: The Hindenburg Engulfed in Flames</h4>
+            <blockquote>
+              “It burst into flames!... It’s fire and it’s crashing! It’s crashing terrible!... Oh, the humanity and all the passengers screaming around here! I can’t talk, ladies and gentlemen... Honest, it’s just laying there, a mass of smoking wreckage.”
+            </blockquote>
+            <p>
+              <strong>Media Analysis:</strong> Sam Shere’s photograph of the 804-foot dirigible being consumed by fire in under 34 seconds became one of the most widely circulated catastrophe images of the twentieth century. Captured alongside Herbert Morrison’s live lacquer-disc broadcast for WLS Chicago, the sudden visual destruction shattered the public illusion of lighter-than-air flight. Print coverage allowed for calculated editorial distance, but the combination of real-time eyewitness reporting and photographs of the fireball brought audiences directly into the visceral horror of technological failure.
+            </p>
+          </div>
+        </div>
+
+        <!-- Primary Source 5: Universal Newsreel Title Card -->
+        <div class="exhibit-grid">
+          <div class="exhibit-media">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Universal_Newspaper_Newsreel_-_Hindenburg_Disaster_%281937%29.png" alt="Opening frame of Universal Newspaper Newsreel covering the Hindenburg Disaster">
+            <div class="caption">Universal Newspaper Newsreel headline title card: <em>Hindenburg Explodes!</em>, May 10, 1937. Source: National Archives and Records Administration.</div>
+          </div>
+          <div class="exhibit-analysis">
+            <span class="metadata-tag">Primary Source Artifact 5</span>
+            <h4>Universal Newspaper Newsreel: "Hindenburg Explodes!" (May 1937)</h4>
+            <p>
+              Within days of the disaster, newsreel houses produced synchronized sound reels that played to packed movie theaters across the globe, transforming a local crash into a mass-media cinematic spectacle.
+            </p>
+            <p>
+              <strong>Media Analysis:</strong> Newsreels were the primary visual news medium for cinema audiences in the 1930s. Universal's treatment utilized rapid cross-cutting, dramatic orchestral swells, and intense typographic graphics to dramatize the explosion. By juxtaposing Morrison’s audio tracks against slow-motion footage of the burning frame collapsing to the ground, newsreel coverage shattered the popular illusion that giant rigid airships were majestic and safe, ending commercial passenger zeppelin operations permanently.
+            </p>
+          </div>
+        </div>
+
+        <div class="lead-box">
+          <strong>Secondary Source Scholarship:</strong>
+          Media historians Michael Biel (*The Anatomy of a Disaster: Herbert Morrison and the Hindenburg*) and Rick Shenkman observe that the broadcast’s place in collective memory solidified when newsreel companies (such as Universal, Pathé, and Movietone) synchronized Morrison's WLS audio tracks with 35mm film footage for cinema audiences. Pairing Morrison's distressed cry of "Oh, the humanity!" with striking visuals of the burning airship destroyed public confidence in commercial hydrogen zeppelins overnight, bringing the rigid airship era to an immediate end.
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: JET AGE & COLD WAR -->
+    <section id="era2" class="tab-content">
+      <div class="card">
+        <h2>Sub-Topic 3: Late-Twentieth-Century Aviation & Geopolitics (1970–1990)</h2>
+        <p>
+          This section examines how post-war photojournalism, survivor profiles, and international diplomacy framed high-tech transportation failures during the Cold War and jumbo-jet era.[cite: 4]
+        </p>
+
+        <!-- Primary Source 6: Tenerife Collision Runway Schematic -->
+        <div class="exhibit-grid">
+          <div class="exhibit-media">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Tenerife_airport_disaster_runway_diagram.png" alt="Runway collision diagram of the Tenerife airport disaster">
+            <div class="caption">Official runway collision schematic from the Spanish Ministry of Public Works investigative report, March 1977. Source: Wikimedia Commons.</div>
+          </div>
+          <div class="exhibit-analysis">
+            <span class="metadata-tag">Primary Source Artifact 6</span>
+            <h4>Investigative Schematics: The Tenerife Airport Runway Collision</h4>
+            <p>
+              The collision of Pan Am 1736 and KLM 4805 in heavy fog at Los Rodeos Airport on March 27, 1977, remains the deadliest accident in commercial aviation history.
+            </p>
+            <p>
+              <strong>Media Analysis:</strong> Coverage combined dramatic reporting with technical explainers.[cite: 4] Rather than treating the accident as an unavoidable stroke of bad luck, the press published regional maps of the Canary Islands and detailed reports explaining how diverted flights overwhelmed a secondary runway lacking ground radar. By examining the collision schematic alongside accounts of misheard air traffic communications, the coverage helped push international regulators to standardize aviation phraseology and implement Crew Resource Management (CRM) in airline cockpits.
+            </p>
+          </div>
+        </div>
+
+        <!-- Primary Source 7: USS Vincennes Official Photo -->
+        <div class="exhibit-grid">
+          <div class="exhibit-media">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/USS_Vincennes_%28CG-49%29_firing_SM-2_missile_1987.jpg" alt="Guided missile cruiser USS Vincennes firing a missile in 1987">
+            <div class="caption">Guided missile cruiser USS <em>Vincennes</em> (CG-49) firing an SM-2 missile in the late 1980s. Source: U.S. Navy Official Archive / Wikimedia Commons.</div>
+          </div>
+          <div class="exhibit-analysis">
+            <span class="metadata-tag">Primary Source Artifact 7</span>
+            <h4>Naval Press Documentation: USS Vincennes in the Persian Gulf</h4>
+            <p>
+              On July 3, 1988, the guided missile cruiser USS <em>Vincennes</em> fired two surface-to-air missiles at Iran Air Flight 655 over the Persian Gulf, killing 290 passengers and crew.
+            </p>
+            <p>
+              <strong>Media Analysis:</strong> This artifact highlights the technical and geopolitical focus of late Cold War reporting.[cite: 4] Media organizations ran minute-by-minute timelines, maps of the Strait of Hormuz, and analyses examining automated weapons systems. Reports directly questioned how the Aegis combat computers misread a climbing civilian Airbus A300 as a descending Iranian F-14 fighter jet. The public scrutiny pushed the Department of Defense to revise automated radar displays and reform military-civilian air corridors.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: 24/7 BROADCAST & REFORM -->
+    <section id="era3" class="tab-content">
+      <div class="card">
+        <h2>Sub-Topic 4: The 24/7 Broadcast Age & Institutional Reform (2001–Present)</h2>
+        <p>
+          This section analyzes the shift to continuous rolling television news coverage, permanent collective memory, and rapid institutional transformation following September 11, 2001.[cite: 4]
+        </p>
+
+        <!-- Primary Source 8: World Trade Center Smoke -->
+        <div class="exhibit-grid">
+          <div class="exhibit-media">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/WTC_smoking_on_9-11.jpeg" alt="World Trade Center towers smoking on September 11, 2001">
+            <div class="caption">Smoke rising from the World Trade Center towers, September 11, 2001. Source: Michael Foran / National Archives / Wikimedia Commons.</div>
+          </div>
+          <div class="exhibit-analysis">
+            <span class="metadata-tag">Primary Source Artifact 8</span>
+            <h4>Breaking Television Broadcast Coverage (September 11, 2001)</h4>
+            <p>
+              The visual recording of the second plane impact on live morning television permanently altered crisis communication, inaugurating the permanent news "chyron" and 24-hour looped coverage.[cite: 4]
+            </p>
+            <p>
+              <strong>Media Analysis:</strong> Live cable news shifted within minutes from reporting an apparent aviation accident to framing the event as a deliberate, organized attack on national infrastructure.[cite: 4] The ceaseless repetition of impact footage created an unprecedented collective psychological impact that erased the boundaries between local catastrophe and nationwide trauma, accelerating public support for urgent wartime legislation and executive restructuring.[cite: 4]
+            </p>
+          </div>
+        </div>
+
+        <!-- Primary Source 9: Bush Signing ATSA Photo -->
+        <div class="exhibit-grid">
+          <div class="exhibit-media">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/George_W._Bush_signs_Aviation_and_Transportation_Security_Act.jpg" alt="President George W. Bush signing the Aviation and Transportation Security Act into law on November 19, 2001">
+            <div class="caption">President George W. Bush signs Public Law 107-71, the Aviation and Transportation Security Act, November 19, 2001. Source: White House Photo / National Archives and Records Administration.</div>
+          </div>
+          <div class="exhibit-analysis">
+            <span class="metadata-tag">Primary Source Artifact 9</span>
+            <h4>Public Law 107-71: Aviation and Transportation Security Act (Nov. 19, 2001)</h4>
+            <p>
+              Enacted just 69 days after the attacks, this statutory artifact mandated the replacement of private airport screening contracts with a unified federal workforce under the Transportation Security Administration (TSA).[cite: 4]
+            </p>
+            <p>
+              <strong>Media Analysis:</strong> In the weeks leading up to this signing, news networks aired aggressive investigative exposés uncovering undercover security tests where simulated weapons bypassed private checkpoint screeners. By framing airport security as a national defense failure rather than a private airline operating expense, media pressure forced bipartisan passage of ATSA, fundamentally transforming civil aviation travel into a federally secured frontier.[cite: 4]
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Framing Catastrophe — Virtual Museum Exhibit[cite: 4]</p>
+    <p style="margin-top: 8px; font-size: 0.8rem; color: #6e7681;">
+      Primary artifacts sourced from the National Archives, Library of Congress, and press archives.[cite: 1, 2] Formatted in accordance with Chicago Manual of Style (CMS) criteria.[cite: 3]
+    </p>
+  </footer>
+
+  <script>
+    function openTab(evt, tabName) {
+      const contents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < contents.length; i++) {
+        contents[i].classList.remove("active");
+      }
+
+      const buttons = document.querySelectorAll("nav button");
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove("active");
+      }
+
+      document.getElementById(tabName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  </script>
+</body>
+</html>
